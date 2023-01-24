@@ -24,6 +24,9 @@ See more at https://thingpulse.com
 
 Many thanks go to various contributors such as Adafruit, Waveshare.
 */
+#if defined(USE_MINIGRAFX_CUSTOM_MODS) && USE_MINIGRAFX_CUSTOM_MODS == 1
+#include <umm_malloc/umm_heap_select.h>
+#endif
 #include "MiniGrafx.h"
 
 MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette) {
@@ -55,6 +58,11 @@ void MiniGrafx::init() {
 }
 
 void MiniGrafx::initializeBuffer() {
+#if defined(USE_MINIGRAFX_CUSTOM_MODS) && USE_MINIGRAFX_CUSTOM_MODS == 1
+  // Use IRAM as heap for library (Will only work for 2 bits per pixel, 4 colors)
+  HeapSelectIram ephemeral;
+  Serial.printf_P(PSTR("MiniGrafx::initializeBuffer() Heap before: %u\n"), ESP.getFreeHeap());
+#endif
   this->bitMask = (1 << bitsPerPixel) - 1;
   this->pixelsPerByte = 8 / bitsPerPixel;
   // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
@@ -84,13 +92,14 @@ void MiniGrafx::initializeBuffer() {
       break;
   }
 
-
-
   this->bufferSize = this->width * this->height / (pixelsPerByte);
   this->buffer = (uint8_t*) malloc(sizeof(uint8_t) * bufferSize);
   if(!this->buffer) {
     Serial.println("[DEBUG_MINI_GRAFX][init] Not enough memory to create display\n");
   }
+#if defined(USE_MINIGRAFX_CUSTOM_MODS) && USE_MINIGRAFX_CUSTOM_MODS == 1
+  Serial.printf_P(PSTR("MiniGrafx::initializeBuffer() Heap after: %u\n"), ESP.getFreeHeap());
+#endif  
 }
 
 void MiniGrafx::freeBuffer() {

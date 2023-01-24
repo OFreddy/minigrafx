@@ -255,20 +255,35 @@ void ILI9341_SPI::init(void) {
 
   writecommand(0xCF);
   writedata(0x00);
+#if defined(USE_MINIGRAFX_CUSTOM_MODS) && USE_MINIGRAFX_CUSTOM_MODS == 1
+  writedata(0X81); 
+#else  
   writedata(0XC1);
+#endif  
   writedata(0X30);
 
   writecommand(0xED);
+#if defined(USE_MINIGRAFX_CUSTOM_MODS) && USE_MINIGRAFX_CUSTOM_MODS == 1
+  writedata(0x55); 
+  writedata(0x01);
+  writedata(0X23);
+  writedata(0X01);
+#else
   writedata(0x64);
-  writedata(0x03);
+  writedata(0x64);
   writedata(0X12);
   writedata(0X81);
-
+#endif
   writecommand(0xE8);
+#if defined(USE_MINIGRAFX_CUSTOM_MODS) && USE_MINIGRAFX_CUSTOM_MODS == 1
+  writedata(0x84); 
+  writedata(0x11); 
+  writedata(0x7A); 
+#else
   writedata(0x85);
   writedata(0x00);
   writedata(0x78);
-
+#endif
   writecommand(0xCB);
   writedata(0x39);
   writedata(0x2C);
@@ -280,7 +295,11 @@ void ILI9341_SPI::init(void) {
   writedata(0x20);
 
   writecommand(0xEA);
+#if defined(USE_MINIGRAFX_CUSTOM_MODS) && USE_MINIGRAFX_CUSTOM_MODS == 1
+  writedata(0x66); 
+#else  
   writedata(0x00);
+#endif  
   writedata(0x00);
 
   writecommand(ILI9341_PWCTR1);    //Power control
@@ -297,7 +316,11 @@ void ILI9341_SPI::init(void) {
   writedata(0x86);  //--
 
   writecommand(ILI9341_MADCTL);    // Memory Access Control
+#if defined(USE_MINIGRAFX_CUSTOM_MODS) && USE_MINIGRAFX_CUSTOM_MODS == 1
+  writedata(0x40); 
+#else  
   writedata(0x48);
+#endif  
 
   writecommand(ILI9341_PIXFMT);
   writedata(0x55);
@@ -396,22 +419,39 @@ void ILI9341_SPI::setRotation(uint8_t m) {
   rotation = m % 4; // can't be higher than 3
   switch (rotation) {
    case 0:
+#if defined(USE_MINIGRAFX_CUSTOM_MODS) && USE_MINIGRAFX_CUSTOM_MODS == 1
+     writedata(MADCTL_MX);
+#else
      writedata(MADCTL_MX | MADCTL_BGR);
+#endif	 
      _width  = ILI9341_TFTWIDTH;
      _height = ILI9341_TFTHEIGHT;
      break;
    case 1:
+#if defined(USE_MINIGRAFX_CUSTOM_MODS) && USE_MINIGRAFX_CUSTOM_MODS == 1
+     writedata(MADCTL_MV);
+#else
      writedata(MADCTL_MV | MADCTL_BGR);
+#endif	 
+	 
      _width  = ILI9341_TFTHEIGHT;
      _height = ILI9341_TFTWIDTH;
      break;
   case 2:
+#if defined(USE_MINIGRAFX_CUSTOM_MODS) && USE_MINIGRAFX_CUSTOM_MODS == 1
+    writedata(MADCTL_MY);
+#else
     writedata(MADCTL_MY | MADCTL_BGR);
+#endif	
      _width  = ILI9341_TFTWIDTH;
      _height = ILI9341_TFTHEIGHT;
     break;
    case 3:
+#if defined(USE_MINIGRAFX_CUSTOM_MODS) && USE_MINIGRAFX_CUSTOM_MODS == 1
+     writedata(MADCTL_MX | MADCTL_MY | MADCTL_MV);
+#else
      writedata(MADCTL_MX | MADCTL_MY | MADCTL_MV | MADCTL_BGR);
+#endif	 
      _width  = ILI9341_TFTHEIGHT;
      _height = ILI9341_TFTWIDTH;
      break;
