@@ -413,9 +413,9 @@ void MiniGrafx::setFontFile(String fileName) {
   fontFile.close();
   fontFile = SPIFFS.open(fileName, "r");
   if (!fontFile) {
-    Serial.println("Could not open font file " + fileName);
+    Serial.printf_P(PSTR("Could not open font file %s"), fileName.c_str());
   } else {
-    Serial.println("Set font file " + fileName);
+    Serial.printf_P(PSTR("Set font file "), fileName.c_str());
   }
 }
 
@@ -672,7 +672,7 @@ void MiniGrafx::drawXbm(int16_t xMove, int16_t yMove, int16_t width, int16_t hei
   }
 }
 void MiniGrafx::drawBmpFromFile(String filename, uint8_t xMove, uint16_t yMove) {
-  Serial.println("In drawBmpFromFile");
+  Serial.printf_P(PSTR("In drawBmpFromFile"));
   File     bmpFile;
   int      bmpWidth, bmpHeight;   // W+H in pixels
   uint8_t  bmpDepth;              // Bit depth (currently must be 24)
@@ -721,7 +721,7 @@ void MiniGrafx::drawBmpFromFile(String filename, uint8_t xMove, uint16_t yMove) 
     bmpHeight = read32(bmpFile);
     if(read16(bmpFile) == 1) { // # planes -- must be '1'
       bmpDepth = read16(bmpFile); // bits per pixel
-      Serial.print(F("Bit Depth: ")); Serial.println(bmpDepth);
+      Serial.printf_P(PSTR("Bit Depth: %u\n"), bmpDepth);
       if((read32(bmpFile) == 0)) { // 0 = uncompressed
 
 
@@ -972,7 +972,7 @@ void MiniGrafx::drawPalettedBitmapFromPgm(uint16_t xMove, uint16_t yMove, const 
   uint8_t version = pgm_read_byte(palBmp);
   uint8_t bmpBitDepth = pgm_read_byte(palBmp + 1);
   if (bmpBitDepth != bitsPerPixel) {
-    Serial.println("Bmp has wrong bit depth");
+    Serial.println(F("Bmp has wrong bit depth"));
     return;
   }
   uint16_t width = pgm_read_byte(palBmp + 2) << 8 | pgm_read_byte(palBmp + 3);
@@ -1017,31 +1017,30 @@ void MiniGrafx::drawPalettedBitmapFromPgm(uint16_t xMove, uint16_t yMove, const 
 }
 
 void MiniGrafx::drawPalettedBitmapFromFile(uint16_t xMove, uint16_t yMove, String fileName) {
-  Serial.println("Drawing " + fileName);
+  Serial.printf_P(PSTR("Drawing %s\n"), fileName);
   File file = SPIFFS.open(fileName, "r");
   if (!file) {
-    Serial.print("File " + fileName + " not found");
+    Serial.printf_P(PSTR("File %s not found\n"), fileName.c_str());
     return;
   }
   uint32_t fileSize = file.size();
-  Serial.println("FileSize:" + String(fileSize));
+  Serial.printf_P(PSTR("FileSize: %u"), fileSize);
   char buf[128] = { 0 };
   file.readBytes(buf, 6);
   fileSize -= 6;
   uint8_t version = buf[0];
   uint8_t bmpBitDepth = buf[1];
-  Serial.println("Version:" + String(version));
-  Serial.println("BitDepth:" + String(bmpBitDepth));
+  Serial.printf_P(PSTR("Version: %u\n"), version);
+  Serial.printf_P(PSTR("BitDepth: %u\n"), bmpBitDepth);
   if (bmpBitDepth != bitsPerPixel) {
-    Serial.printf("Bmp has wrong bit depth. Device: %d, bmp: %d\n", bitsPerPixel, bmpBitDepth);
+    Serial.printf_P(PSTR("Bmp has wrong bit depth. Device: %d, bmp: %d\n"), bitsPerPixel, bmpBitDepth);
     return;
   }
   uint16_t width = buf[2] << 8 | buf[3];
   uint16_t height = buf[4] << 8 | buf[5];
 
 
-  Serial.println("Width:  " + String(width));
-  Serial.println("Height: " + String(height));
+  Serial.printf_P(PSTR("Width: %u Height: %u\n"), width, height);
 
   int16_t widthRoundedUp = (width + 7) & ~7;
 
