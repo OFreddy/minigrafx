@@ -37,8 +37,6 @@ MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *pale
   this->initialHeight = driver->height();
   this->palette = palette;
   this->bitsPerPixel = bitsPerPixel;
-  //initializeBuffer();
-
 }
 
 MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette, uint16_t width, uint16_t height) {
@@ -95,7 +93,7 @@ void MiniGrafx::initializeBuffer() {
   this->bufferSize = this->width * this->height / (pixelsPerByte);
   this->buffer = (uint8_t*) malloc(sizeof(uint8_t) * bufferSize);
   if(!this->buffer) {
-    Serial.println("[DEBUG_MINI_GRAFX][init] Not enough memory to create display\n");
+    Serial.printf_P(PSTR("[DEBUG_MINI_GRAFX][init] Not enough memory to create display\n"));
   }
 #if defined(USE_MINIGRAFX_CUSTOM_MODS) && USE_MINIGRAFX_CUSTOM_MODS == 1
   Serial.printf_P(PSTR("MiniGrafx::initializeBuffer() Heap after: %u\n"), ESP.getFreeHeap());
@@ -103,11 +101,13 @@ void MiniGrafx::initializeBuffer() {
 }
 
 void MiniGrafx::freeBuffer() {
-  free(this->buffer);
+  if (this->buffer)
+    free(this->buffer);
 }
 
 void MiniGrafx::changeBitDepth(uint8_t bitsPerPixel, uint16_t *palette) {
-  free(this->buffer);
+  if (this->buffer)
+    free(this->buffer);
   initializeBuffer();
 }
 
@@ -524,6 +524,8 @@ void inline MiniGrafx::drawInternal(int16_t xMove, int16_t yMove, int16_t width,
 void MiniGrafx::setPixel(uint16_t xPos, uint16_t yPos) {
   uint16_t x = xPos;
   uint16_t y = yPos;
+  if (!this->buffer)
+    return;
   if (isMirroredHorizontally) {
     x = width - xPos;
   }
@@ -559,6 +561,8 @@ void MiniGrafx::setPixel(uint16_t xPos, uint16_t yPos) {
 }
 
 uint16_t MiniGrafx::getPixel(uint16_t x, uint16_t y) {
+  if (!this->buffer)
+    return 0;
   if (x >= width || y >= height || x < 0 || y < 0 || color < 0 || color > 15) return 0;
   // bitsPerPixel: 8, pixPerByte: 1, 0  1 = 2^0
   // bitsPerPixel: 4, pixPerByte: 2, 1  2 = 2^1
@@ -575,11 +579,13 @@ uint16_t MiniGrafx::getPixel(uint16_t x, uint16_t y) {
 }
 
 void MiniGrafx::fillBuffer(uint8_t pal) {
-    uint8_t byteCol = pal;
-    for (int i = 0; i < pixelsPerByte; i++) {
-      byteCol |= (pal << (bitsPerPixel * i));
-    }
-    memset(buffer, byteCol, bufferSize);
+  uint8_t byteCol = pal;
+  if (!this->buffer)
+    return;
+  for (int i = 0; i < pixelsPerByte; i++) {
+    byteCol |= (pal << (bitsPerPixel * i));
+  }
+  memset(buffer, byteCol, bufferSize);
 }
 
 void MiniGrafx::clear() {
@@ -588,6 +594,8 @@ void MiniGrafx::clear() {
 
 void MiniGrafx::commit() {
   BufferInfo bufferInfo;
+  if (!this->buffer)
+    return;
   bufferInfo.buffer = this->buffer;
   bufferInfo.bitsPerPixel = this->bitsPerPixel;
   bufferInfo.palette = this->palette;
@@ -605,6 +613,8 @@ void MiniGrafx::commit() {
 
 void MiniGrafx::commit(uint16_t xPos, uint16_t yPos) {
   BufferInfo bufferInfo;
+  if (!this->buffer)
+    return;
   bufferInfo.buffer = this->buffer;
   bufferInfo.bitsPerPixel = this->bitsPerPixel;
   bufferInfo.palette = this->palette;
@@ -622,6 +632,8 @@ void MiniGrafx::commit(uint16_t xPos, uint16_t yPos) {
 
 void MiniGrafx::commit(uint16_t srcXPos, uint16_t srcYPos, uint16_t srcWidth, uint16_t srcHeight, uint16_t targetXPos, uint16_t targetYPos) {
   BufferInfo bufferInfo;
+  if (!this->buffer)
+    return;
   bufferInfo.buffer = this->buffer;
   bufferInfo.bitsPerPixel = this->bitsPerPixel;
   bufferInfo.palette = this->palette;
