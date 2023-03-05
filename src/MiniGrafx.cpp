@@ -92,6 +92,7 @@ void MiniGrafx::initializeBuffer() {
   }
 
   this->bufferSize = this->width * this->height / (pixelsPerByte);
+  Serial.printf_P(PSTR("[DEBUG_MINI_GRAFX][init] Aquiring %u bytes...\n"), sizeof(uint8_t) * bufferSize);
   this->buffer = (uint8_t*) malloc(sizeof(uint8_t) * bufferSize);
   if(!this->buffer) {
     Serial.printf_P(PSTR("[DEBUG_MINI_GRAFX][init] Not enough memory to create display\n"));
