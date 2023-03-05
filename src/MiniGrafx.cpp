@@ -58,9 +58,17 @@ bool MiniGrafx::init() {
 
 void MiniGrafx::initializeBuffer() {
 #if defined(USE_MINIGRAFX_CUSTOM_MODS) && USE_MINIGRAFX_CUSTOM_MODS == 1
+#if defined(MINIGRAFX_HEAP_IRAM)
   // Use IRAM as heap for library (Will only work for 2 bits per pixel, 4 colors)
   HeapSelectIram ephemeral;
-  Serial.printf_P(PSTR("MiniGrafx::initializeBuffer() Heap before: %u\n"), ESP.getFreeHeap());
+  Serial.printf_P(PSTR("MiniGrafx::initializeBuffer() IRAM Heap before: %u\n"), ESP.getFreeHeap());
+#else  
+  // Use DRAM as heap for library (Will only work for 2 bits per pixel, 4 colors)
+  HeapSelectDram ephemeral;
+  Serial.printf_P(PSTR("MiniGrafx::initializeBuffer() DRAM Heap before: %u\n"), ESP.getFreeHeap());
+#endif  
+  
+  
 #endif
   this->bitMask = (1 << bitsPerPixel) - 1;
   this->pixelsPerByte = 8 / bitsPerPixel;
