@@ -49,10 +49,11 @@ MiniGrafx::MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *pale
   this->bitsPerPixel = bitsPerPixel;
 }
 
-
-void MiniGrafx::init() {
+bool MiniGrafx::init() {
   this->initializeBuffer();
-  this->driver->init();
+  if (this->buffer)
+    this->driver->init();
+  return this->buffer != NULL;
 }
 
 void MiniGrafx::initializeBuffer() {

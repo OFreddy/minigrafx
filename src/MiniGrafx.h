@@ -80,7 +80,7 @@ class MiniGrafx {
  public:
   MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette);
   MiniGrafx(DisplayDriver *driver, uint8_t bitsPerPixel, uint16_t *palette, uint16_t width, uint16_t height);
-  void init();
+  bool init();
   void changeBitDepth(uint8_t bitsPerPixel, uint16_t *palette);
   uint16_t getHeight();
   uint16_t getWidth();
